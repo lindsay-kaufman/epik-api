@@ -13,6 +13,7 @@ initialise(passport)
  * lookup moment.js for future querying
  * replace bodyParser
  * in delete methods status 200 but app crashes with error: Cannot set headers after they are sent to the client
+ * finish gitignore file
  */
 
 app.use(bodyParser.json())
@@ -40,6 +41,7 @@ app.get('/', (res) => {
 })
 
 const authRoutes = require('./app/routes/auth-routes')
+const toDoRoutes = require('./app/routes/to-do-routes')
 const goalRoutes = require('./app/routes/goal-routes')
 const activityRoutes = require('./app/routes/activity-routes')
 const moodRoutes = require('./app/routes/mood-routes')
@@ -51,6 +53,11 @@ app.delete('/users/:id', authRoutes.deleteUser)
 app.post('/users', authRoutes.register) //needs hashed pw
 app.post('/users', authRoutes.signIn) //not working
 
+
+app.get('/todo/:user_id', toDoRoutes.getToDoList)
+app.post('/todo', toDoRoutes.addListItem)
+app.put('/todo/:user_id/:id', toDoRoutes.updateListItem)
+app.delete('/todo/:user_id/:id', toDoRoutes.deleteListItem)
 
 app.post('/goals', goalRoutes.addNewGoal)
 app.get('/goals/:user_id', goalRoutes.getUserGoals)
