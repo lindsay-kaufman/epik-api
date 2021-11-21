@@ -8,7 +8,7 @@ const getToDoList = (req, res) => {
     [user],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error('cannot get list')
       }
       res.status(200).json(results.rows)
     }
@@ -37,8 +37,8 @@ const updateListItem = (req, res) => {
   const { name, completed } = req.body
 
   pool.query(
-    'UPDATE to_do SET name = $1, completed = $2',
-    [name, completed],
+    'UPDATE to_do SET name = $1, completed = $2 WHERE user_id = $3 and id = $4',
+    [name, completed, user_id, id],
     error => {
       if (error) {
         throw error

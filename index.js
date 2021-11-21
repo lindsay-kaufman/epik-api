@@ -36,6 +36,14 @@ app.use(passport.initialize())
 
 app.use(passport.session())
 
+app.use(function (req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+  });
+
 app.get('/', (res) => {
   res.json({ info: 'Node.js, Express, and Postgres API' })
 })
@@ -52,7 +60,6 @@ app.put('/users/:id', authRoutes.updateUser)
 app.delete('/users/:id', authRoutes.deleteUser)
 app.post('/users', authRoutes.register) //needs hashed pw
 app.post('/users', authRoutes.signIn) //not working
-
 
 app.get('/todo/:user_id', toDoRoutes.getToDoList)
 app.post('/todo', toDoRoutes.addListItem)
