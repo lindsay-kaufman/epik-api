@@ -8,7 +8,7 @@ const getUserGoals = (req, res) => {
     [user],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user goals: ${error}`)
       }
       res.status(200).json(results.rows)
     }
@@ -24,21 +24,12 @@ const getUserGoalById = (req, res) => {
     [user_id, id],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get goal: ${error}`)
       }
       res.status(200).json(results.rows)
     }
   )
 }
-
-// create table goal_occurances
-// goal_id
-// created_at
-
-// query occurances by goal id to see all occurances
-
-// find goals whos start date + interval = date
-//select cast(date_trunc('month', current_date) as date)
 
 const addNewGoal = (req, res) => {
   const {
@@ -64,9 +55,9 @@ const addNewGoal = (req, res) => {
     ],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot add goal: ${error}`)
       }
-      res.status(201).send('New goal added!')
+      res.status(201).json()
     }
   )
 }
@@ -102,9 +93,9 @@ const updateGoal = (req, res) => {
     ],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot update goal: ${error}`)
       }
-      res.status(200).send('Goal modified')
+      res.status(200).json()
     }
   )
 }
@@ -118,9 +109,9 @@ const deleteGoal = (req, res) => {
     [user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot delete goal: ${error}`)
       }
-      res.status(200).send('Goal deleted')
+      res.json()
     }
   )
 }

@@ -1,11 +1,4 @@
-const Pool = require('pg').Pool
-const pool = new Pool({
-  user: 'lindsaykaufman',
-  host: 'localhost',
-  database: 'calendar',
-  password: '3139Lakeshore',
-  port: 5432,
-})
+const { pool } = require('./../../dbConfig')
 
 const getUserSleep = (req, res) => {
   const user_id = parseInt(req.params.user_id)
@@ -15,7 +8,8 @@ const getUserSleep = (req, res) => {
     [user_id],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user sleep: ${error}`)
+
       }
       res.status(200).json(results.rows)
     }
@@ -31,7 +25,7 @@ const getSleepByDay = (req, res) => {
     [user_id, created_at],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user sleep: ${error}`)
       }
       res.status(200).json(results.rows)
     }
@@ -46,9 +40,9 @@ const addNewSleepRecord = (req, res) => {
     [hours, quality, dreams, user_id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot add user sleep: ${error}`)
       }
-      res.status(201).send('Record added')
+      res.status(201).json()
     }
   )
 }
@@ -62,8 +56,11 @@ const updateSleepRecord = (req, res) => {
   pool.query(
     'UPDATE sleep SET hours = $1, quality = $2, dreams = $3 WHERE user_id = $4 and id = $5',
     [hours, quality, dreams, user_id, id],
-    () => {
-      res.status(200).send('Record updated')
+    error => {
+      if (error) {
+        throw new Error(`Cannot update user sleep: ${error}`)
+      }
+      res.status(200).json()
     }
   )
 }
@@ -77,9 +74,9 @@ const deleteSleepRecord = (req, res) => {
     [user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot delete user sleep: ${error}`)
       }
-      res.json(200).send('Record deleted')
+      res.json()
     }
   )
 }

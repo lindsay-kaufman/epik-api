@@ -1,25 +1,20 @@
 const { pool } = require('./../../dbConfig')
-const moment = require('moment')
 
-const getUserActivitiesByDay = (req, res) => {
+const getUserActivities = (req, res) => {
   const user_id = parseInt(req.params.user_id)
-  const created_at = parseInt(req.params.created_at)
-
-  const createdAt = pm.environment.set(created_at, moment().format(("YYYY-MM-DD")));
 
   pool.query(
-    'SELECT * FROM activity WHERE user_id = $1 AND createdAt = $2',
-    [user_id, createdAt],
+    'SELECT * FROM activity WHERE user_id = $1',
+    [user_id],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user activities: ${error}`)
       }
       res.status(200).json(results.rows)
     }
   )
 }
 
-// might not need this
 const getUserActivityById = (req, res) => {
   const user_id = parseInt(req.params.user_id)
   const id = parseInt(req.params.id)
@@ -29,7 +24,7 @@ const getUserActivityById = (req, res) => {
     [user_id, id],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user activities: ${error}`)
       }
       res.status(200).json(results.rows)
     }
@@ -44,9 +39,9 @@ const addNewActivity = (req, res) => {
     [description, user_id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot add activity: ${error}`)
       }
-      res.status(201).send('New activity added!')
+      res.status(201).json()
     }
   )
 }
@@ -62,9 +57,9 @@ const updateActivity = (req, res) => {
     [description, user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot update activity: ${error}`)
       }
-      res.status(200).send('Activity modified')
+      res.status(200).json()
     }
   )
 }
@@ -78,15 +73,15 @@ const deleteActivity = (req, res) => {
     [user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot delete activity: ${error}`)
       }
-      res.status(200).send('Activity deleted')
+      res.json()
     }
   )
 }
 
 module.exports = {
-  getUserActivitiesByDay,
+  getUserActivities,
   getUserActivityById,
   addNewActivity,
   updateActivity,

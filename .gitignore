@@ -1,6 +1,6 @@
 .env
 .vscode
-.credentials.json
-.token.json
-/node_modules
+credentials.json
+token.json
+node_modules
 

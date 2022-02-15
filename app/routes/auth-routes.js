@@ -27,7 +27,7 @@ const register = async (req, res) => {
     [email],
     (err, results) => {
       if (err) {
-        throw err
+        throw new Error('No user found')
       }
 
       if (results.rows.length > 0) {
@@ -35,12 +35,13 @@ const register = async (req, res) => {
       } else {
         pool.query(
           'INSERT INTO users (firstName, lastName, email, password) VALUES ($1, $2, $3, $4)',
-          [firstName, lastName, email, password],
-          (err) => {
-            if (err) {
-              throw err
+          [firstName, lastName, email, hashedPassword],
+          (error) => {
+            if (error) {
+              throw new Error(`Cannot register user: ${error}`)
+
             }
-            res.status(201).send(`User signed up`)
+            res.status(201).json()
           }
         )
       }
@@ -59,7 +60,7 @@ const signIn = (req, res) => {
       if (error) {
         throw error
       } else if (!results) {
-        throw new Error('no user found')
+        throw new Error('No user found')
       }
 
       user = results
@@ -71,7 +72,7 @@ const signIn = (req, res) => {
         user.token = token // might need to add token to user table
         return user.save()
       } else {
-        throw error
+        throw new Error('Cannot sign in')
       }
     })
     .then(user => {
@@ -79,7 +80,6 @@ const signIn = (req, res) => {
     })
 }
 
-//how do i make it so the user does not need to input every field? do i do this on the front end?
 const updateUser = (req, res) => {
   const id = parseInt(req.params.id)
   const { firstName, lastName, email, password } = req.body
@@ -89,9 +89,10 @@ const updateUser = (req, res) => {
     [firstName, lastName, email, password, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot update user: ${error}`)
+
       }
-      res.status(200).send(`User modified with ID: ${id}`)
+      res.status(200).json()
     }
   )
 }
@@ -101,9 +102,9 @@ const deleteUser = (req, res) => {
 
   pool.query('DELETE FROM users WHERE id = $1', [id], error => {
     if (error) {
-      throw error
+      throw new Error('Cannot delete user')
     }
-    res.status(200).send(`User deleted with ID: ${id}`)
+    res.json()
   })
 }
 

@@ -4,6 +4,7 @@
 
 -- Dumped from database version 14.0
 -- Dumped by pg_dump version 14.0
+-- command: pg_dump -s databasename
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

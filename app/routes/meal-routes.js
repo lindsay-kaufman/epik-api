@@ -8,7 +8,7 @@ const getUserMeals = (req, res) => {
     [user_id],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user meals: ${error}`)
       }
       res.status(200).json(results.rows)
     }
@@ -24,7 +24,7 @@ const getMealsByDay = (req, res) => {
     [user_id, created_at],
     (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot get user meals: ${error}`)
       }
       res.status(200).json(results.rows)
     }
@@ -35,13 +35,14 @@ const addNewMeal = (req, res) => {
   const { name, notes, user_id } = req.body
 
   pool.query(
-    'INSERT INTO meals (name, notes, user_id) VALUES ($1, $2, $3)',
+    'INSERT INTO meals (name, notes, user_id) VALUES ($1, $2, $3) RETURNING *',
     [name, notes, user_id],
-    error => {
+    (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot add meal: ${error}`)
+
       }
-      res.status(201).send('Meal added')
+      res.status(201).json()
     }
   )
 }
@@ -57,9 +58,9 @@ const updateMeal = (req, res) => {
     [name, notes, user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot update meal: ${error}`)
       }
-      res.status(200).send('Meal updated')
+      res.status(200).json()
     }
   )
 }
@@ -73,9 +74,9 @@ const deleteMeal = (req, res) => {
     [user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot delete meal: ${error}`)
       }
-      res.json(200).send('Meal deleted')
+       res.json()
     }
   )
 }

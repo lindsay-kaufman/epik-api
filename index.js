@@ -5,15 +5,11 @@ const port = process.env.PORT || 3000
 const session = require('express-session')
 const passport = require('passport')
 
-const { initialise } = require('./passportConfig')
-initialise(passport)
-
 /* TODO:
  * deploy to heroku
- * lookup moment.js for future querying
- * replace bodyParser
- * in delete methods status 200 but app crashes with error: Cannot set headers after they are sent to the client
- * finish gitignore file
+ * error handling and input sanitation
+ * normalize responses
+ * update access control origin header
  */
 
 app.use(bodyParser.json())
@@ -32,25 +28,28 @@ app.use(
   })
 )
 
+// initializes authentication
 app.use(passport.initialize())
 
+// turns the user value (session id) into a deserialized user object
 app.use(passport.session())
 
 app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  next();
-  });
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  next()
+})
 
-app.get('/', (res) => {
+app.get('/', res => {
   res.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
 const authRoutes = require('./app/routes/auth-routes')
 const toDoRoutes = require('./app/routes/to-do-routes')
 const goalRoutes = require('./app/routes/goal-routes')
+//const occuranceRoutes = require('./app/routes/goal-occurances-routes')
 const activityRoutes = require('./app/routes/activity-routes')
 const moodRoutes = require('./app/routes/mood-routes')
 const mealRoutes = require('./app/routes/meal-routes')
@@ -70,32 +69,30 @@ app.post('/goals', goalRoutes.addNewGoal)
 app.get('/goals/:user_id', goalRoutes.getUserGoals)
 app.get('/goals/:user_id/:id', goalRoutes.getUserGoalById)
 app.put('/goals/:user_id/:id', goalRoutes.updateGoal)
-app.delete('goals/:user_id/:id', goalRoutes.deleteGoal) //error: cannot delete goal/1/4
+app.delete('goals/:user_id/:id', goalRoutes.deleteGoal)
 
+// app.get('/occurances', occuranceRoutes.getGoalOccurances)
+// app.post('/occurances/:goal_id', occuranceRoutes.addGoalOccurance)
+// app.delete('/occurances/:goal_id/:id', occuranceRoutes.deleteGoalOccurance)
 
 app.get('/activity/:user_id/:id', activityRoutes.getUserActivityById)
-app.get('/activity/:user_id/:created_at', activityRoutes.getUserActivitiesByDay) //what is the syntax here? moment.js
+app.get('/activity/:user_id', activityRoutes.getUserActivities)
 app.post('/activity', activityRoutes.addNewActivity)
 app.put('/activity/:user_id/:id', activityRoutes.updateActivity)
 app.delete('/activity/:user_id/:id', activityRoutes.deleteActivity)
 
-
 app.get('/mood/:user_id', moodRoutes.getMoodByUser)
-app.get('/mood/:user_id/:created_at', moodRoutes.getMoodByDay) //syntax
+app.get('/mood/:user_id/:created_at', moodRoutes.getMoodByDay)
 app.post('/mood', moodRoutes.addNewMoodLog)
 app.put('/mood/:user_id/:id', moodRoutes.updateMoodLog)
 app.delete('/mood/:user_id/:id', moodRoutes.deleteMoodLog)
 
-
 app.get('/meals/:user_id', mealRoutes.getUserMeals)
-app.get('/meals/:user_id/:created_at', mealRoutes.getMealsByDay) //syntax
 app.post('/meals', mealRoutes.addNewMeal)
 app.put('/meals/:user_id/:id', mealRoutes.updateMeal)
-app.delete('/meals/:user_id/:id', mealRoutes.deleteMeal) 
-
+app.delete('/meals/:user_id/:id', mealRoutes.deleteMeal)
 
 app.get('/sleep/:user_id', sleepRoutes.getUserSleep)
-app.get('/sleep/:user_id/:created_at', sleepRoutes.getSleepByDay) //syntax
 app.post('/sleep', sleepRoutes.addNewSleepRecord)
 app.put('/sleep/:user_id/:id', sleepRoutes.updateSleepRecord)
 app.delete('/sleep/:user_id/:id', sleepRoutes.deleteSleepRecord)
@@ -105,6 +102,8 @@ app.listen(port, () => {
 })
 
 /*
+Google Calendar Integration
+
 const fs = require('fs')
 const readline = require('readline')
 const { google } = require('googleapis')

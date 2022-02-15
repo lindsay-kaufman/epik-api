@@ -8,7 +8,7 @@ const getToDoList = (req, res) => {
     [user],
     (error, results) => {
       if (error) {
-        throw new Error('cannot get list')
+        throw new Error(`Cannot get list: ${error}`)
       }
       res.status(200).json(results.rows)
     }
@@ -21,11 +21,11 @@ const addListItem = (req, res) => {
   pool.query(
     'INSERT INTO to_do (name, completed, user_id) VALUES ($1, $2, $3)',
     [name, completed, user_id],
-    error => {
+    (error, results) => {
       if (error) {
-        throw error
+        throw new Error(`Cannot add list item: ${error}`)
       }
-      res.status(201).send('Item added to list')
+      res.status(201).json()
     }
   )
 }
@@ -41,9 +41,9 @@ const updateListItem = (req, res) => {
     [name, completed, user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot update list item: ${error}`)
       }
-      res.status(200).send('List item updated')
+      res.status(200).json()
     }
   )
 }
@@ -57,9 +57,9 @@ const deleteListItem = (req, res) => {
     [user_id, id],
     error => {
       if (error) {
-        throw error
+        throw new Error(`Cannot delete list item: ${error}`)
       }
-      res.status(200).send('Item deleted')
+      res.json()
     }
   )
 }
@@ -68,5 +68,5 @@ module.exports = {
   getToDoList,
   addListItem,
   updateListItem,
-  deleteListItem
+  deleteListItem,
 }
